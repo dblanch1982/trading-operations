@@ -36,7 +36,7 @@ public class OperationService {
     public void saveOperation(OperationDto operation) {
         TradingOperation tradingOperation = toEntity(operation);
         operationRepository.save(tradingOperation);
-        executeOperation("Added " + tradingOperation.side(), tradingOperation);
+        executeOperation("Added " + tradingOperation.getSide(), tradingOperation);
     }
 
 
@@ -48,27 +48,27 @@ public class OperationService {
 
     public void executeOperation(String operationType, TradingOperation operation) {
         logger.info("=== Ausführung der Operation: " + operationType + " ===");
-        logger.info("ID: " + operation.id());
-        logger.info("Asset: " + operation.symbol());
-        logger.info("Aktion: " + operation.side());
+        logger.info("ID: " + operation.getId());
+        logger.info("Asset: " + operation.getSymbol());
+        logger.info("Aktion: " + operation.getSide());
 
         // Mathematische Berechnung des Gesamtvolumens (Menge * Preis)
-        double totalVolume = operation.quantity() * operation.price();
+        double totalVolume = operation.getQuantity() * operation.getPrice();
 
         logger.info(String.format("Volumen: %.2f Einheiten zu je %.2f € (Gesamt: %.2f €)",
-                operation.quantity(), operation.price(), totalVolume));
-        logger.info("Zeitstempel: " + operation.timestamp());
+                operation.getQuantity(), operation.getPrice(), totalVolume));
+        logger.info("Zeitstempel: " + operation.getTimestamp());
         logger.info("================================\n");
     }
 
     private OperationDto toDto(TradingOperation operation) {
         return new OperationDto(
-                operation.id(),
-                operation.symbol(),
-                operation.side(),
-                operation.quantity(),
-                operation.price(),
-                operation.timestamp());
+                operation.getId(),
+                operation.getSymbol(),
+                operation.getSide(),
+                operation.getQuantity(),
+                operation.getPrice(),
+                operation.getTimestamp());
     }
 
     private TradingOperation toEntity(OperationDto operation) {

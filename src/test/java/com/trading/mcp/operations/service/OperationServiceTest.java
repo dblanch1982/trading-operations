@@ -38,20 +38,20 @@ class OperationServiceTest {
 
         List<OperationDto> operations = operationService.getAllOperations();
         assertEquals(1, operations.size());
-        assertEquals(tradingOperation.id(), operations.get(0).getId());
-        assertEquals(tradingOperation.symbol(), operations.get(0).getSymbol());
+        assertEquals(tradingOperation.getId(), operations.get(0).getId());
+        assertEquals(tradingOperation.getSymbol(), operations.get(0).getSymbol());
         verify(operationRepository).findAll();
     }
 
     @Test
     void getOperationByIdReturnsOperationWhenFound() {
         TradingOperation operation = operation();
-        when(operationRepository.findById(operation.id())).thenReturn(Optional.of(operation));
+        when(operationRepository.findById(operation.getId())).thenReturn(Optional.of(operation));
 
-        OperationDto result = operationService.getOperationById(operation.id());
-        assertEquals(operation.id(), result.getId());
-        assertEquals(operation.symbol(), result.getSymbol());
-        verify(operationRepository).findById(operation.id());
+        OperationDto result = operationService.getOperationById(operation.getId());
+        assertEquals(operation.getId(), result.getId());
+        assertEquals(operation.getSymbol(), result.getSymbol());
+        verify(operationRepository).findById(operation.getId());
     }
 
     @Test
@@ -71,12 +71,12 @@ class OperationServiceTest {
 
         ArgumentCaptor<TradingOperation> savedOperation = ArgumentCaptor.forClass(TradingOperation.class);
         verify(operationRepository).save(savedOperation.capture());
-        assertEquals(operation.getId(), savedOperation.getValue().id());
-        assertEquals(operation.getSymbol(), savedOperation.getValue().symbol());
-        assertEquals(operation.getSide(), savedOperation.getValue().side());
-        assertEquals(operation.getQuantity(), savedOperation.getValue().quantity());
-        assertEquals(operation.getPrice(), savedOperation.getValue().price());
-        assertEquals(operation.getTimestamp(), savedOperation.getValue().timestamp());
+        assertEquals(operation.getId(), savedOperation.getValue().getId());
+        assertEquals(operation.getSymbol(), savedOperation.getValue().getSymbol());
+        assertEquals(operation.getSide(), savedOperation.getValue().getSide());
+        assertEquals(operation.getQuantity(), savedOperation.getValue().getQuantity());
+        assertEquals(operation.getPrice(), savedOperation.getValue().getPrice());
+        assertEquals(operation.getTimestamp(), savedOperation.getValue().getTimestamp());
     }
 
     @Test
@@ -101,11 +101,11 @@ class OperationServiceTest {
     private OperationDto dto() {
         TradingOperation operation = operation();
         return new OperationDto(
-                operation.id(),
-                operation.symbol(),
-                operation.side(),
-                operation.quantity(),
-                operation.price(),
-                operation.timestamp());
+                operation.getId(),
+                operation.getSymbol(),
+                operation.getSide(),
+                operation.getQuantity(),
+                operation.getPrice(),
+                operation.getTimestamp());
     }
 }
