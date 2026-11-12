@@ -3,7 +3,6 @@ package com.trading.mcp.operations.service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
 import com.trading.mcp.operations.model.TradingOperation;
@@ -14,7 +13,6 @@ import com.trading.mcp.operations.dto.OperationDto;
 @Service
 public class OperationService {
 
-    Logger logger = Logger.getLogger(OperationService.class.getName());
     private final OperationRepository operationRepository;
 
     public OperationService(OperationRepository operationRepository) {
@@ -34,32 +32,13 @@ public class OperationService {
     }
 
     public void saveOperation(OperationDto operation) {
-        TradingOperation tradingOperation = toEntity(operation);
-        operationRepository.save(tradingOperation);
-        executeOperation("Added " + tradingOperation.getSide(), tradingOperation);
+        operationRepository.save(toEntity(operation));
     }
 
 
     public void deleteOperation(UUID id) {
         operationRepository.deleteById(id);
     }   
-
-    
-
-    public void executeOperation(String operationType, TradingOperation operation) {
-        logger.info("=== Ausführung der Operation: " + operationType + " ===");
-        logger.info("ID: " + operation.getId());
-        logger.info("Asset: " + operation.getSymbol());
-        logger.info("Aktion: " + operation.getSide());
-
-        // Mathematische Berechnung des Gesamtvolumens (Menge * Preis)
-        double totalVolume = operation.getQuantity() * operation.getPrice();
-
-        logger.info(String.format("Volumen: %.2f Einheiten zu je %.2f € (Gesamt: %.2f €)",
-                operation.getQuantity(), operation.getPrice(), totalVolume));
-        logger.info("Zeitstempel: " + operation.getTimestamp());
-        logger.info("================================\n");
-    }
 
     private OperationDto toDto(TradingOperation operation) {
         return new OperationDto(

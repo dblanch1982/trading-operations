@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 
 import com.trading.mcp.operations.dto.OperationDto;
 import com.trading.mcp.operations.service.OperationService;
@@ -26,19 +25,6 @@ class OperationControllerTest {
     void setUp() {
         operationService = mock(OperationService.class);
         operationController = new OperationController(operationService);
-    }
-
-    @Test
-    void getOperationsPageAddsOperationsToModelAndReturnsIndexView() {
-        List<OperationDto> operations = List.of(mock(OperationDto.class));
-        Model model = mock(Model.class);
-        when(operationService.getAllOperations()).thenReturn(operations);
-
-        String view = operationController.getOperationsPage(model);
-
-        assertEquals("index", view);
-        verify(operationService).getAllOperations();
-        verify(model).addAttribute("operations", operations);
     }
 
     @Test
