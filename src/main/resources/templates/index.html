@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b1220">
+    <title>Trading Operations</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --page: #0b1220;
+            --panel: #111b2d;
+            --panel-raised: #152238;
+            --border: #24334a;
+            --text: #edf3fc;
+            --muted: #91a1b8;
+            --green: #39d6a0;
+            --red: #ff7185;
+            --blue: #79a9ff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            min-width: 320px;
+            margin: 0;
+            background:
+                radial-gradient(ellipse at 85% 0%, rgb(40 73 125 / 20%), transparent 34rem),
+                var(--page);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 28px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-mark {
+            display: grid;
+            width: 38px;
+            height: 38px;
+            place-items: center;
+            border: 1px solid rgb(121 169 255 / 28%);
+            border-radius: 12px;
+            background: rgb(121 169 255 / 10%);
+            color: var(--blue);
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .brand-name { font-size: 15px; font-weight: 700; letter-spacing: .01em; }
+        .brand-caption { margin-top: 3px; color: var(--muted); font-size: 12px; }
+        .live { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+        .live::before {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 12px rgb(57 214 160 / 65%);
+            content: "";
+        }
+
+        main { padding: 38px 0 56px; }
+        .page-heading { margin-bottom: 25px; }
+        h1 { margin: 0; font-size: clamp(24px, 4vw, 32px); letter-spacing: -.04em; }
+        .intro { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .card, .operations-panel {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: linear-gradient(145deg, rgb(21 34 56 / 82%), rgb(17 27 45 / 96%));
+        }
+
+        .card { min-height: 126px; padding: 19px 20px; }
+        .metric-label { color: var(--muted); font-size: 13px; }
+        .metric-value { margin-top: 16px; font-size: clamp(22px, 3vw, 29px); font-weight: 700; letter-spacing: -.04em; }
+        .metric-foot { margin-top: 7px; color: var(--muted); font-size: 12px; }
+        .positive { color: var(--green); }
+        .negative { color: var(--red); }
+
+        .operations-panel { overflow: hidden; }
+        .panel-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 22px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h2 { margin: 0; font-size: 15px; font-weight: 650; }
+        .panel-caption { margin-top: 5px; color: var(--muted); font-size: 12px; }
+        .count {
+            flex: 0 0 auto;
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+        th, td { padding: 14px 22px; }
+        th {
+            background: rgb(11 18 32 / 34%);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+        }
+        td { border-top: 1px solid rgb(36 51 74 / 72%); font-size: 13px; }
+        tbody tr { transition: background .15s ease; }
+        tbody tr:hover { background: rgb(121 169 255 / 5%); }
+        .asset { font-weight: 650; }
+        .subtle { color: var(--muted); font-size: 12px; }
+        .number { font-variant-numeric: tabular-nums; }
+        .side {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .side::before { width: 6px; height: 6px; border-radius: 50%; background: currentColor; content: ""; }
+        .side-buy { background: rgb(57 214 160 / 10%); color: var(--green); }
+        .side-sell { background: rgb(255 113 133 / 10%); color: var(--red); }
+
+        .empty { padding: 52px 20px; text-align: center; }
+        .empty-icon {
+            display: grid;
+            width: 44px;
+            height: 44px;
+            margin: 0 auto 14px;
+            place-items: center;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--blue);
+            font-size: 20px;
+        }
+        .empty p { margin: 0; color: var(--muted); font-size: 13px; }
+
+        .flow { padding: 20px 22px 22px; border-top: 1px solid var(--border); }
+        .flow-heading { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+        .flow-legend { display: flex; gap: 14px; color: var(--muted); font-size: 11px; }
+        .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+        .legend-buy { background: var(--green); }
+        .legend-sell { background: var(--red); }
+        .flow-track { display: flex; height: 9px; overflow: hidden; border-radius: 999px; background: var(--border); }
+        .flow-buy { width: 50%; background: var(--green); transition: width .3s ease; }
+        .flow-sell { width: 50%; background: var(--red); transition: width .3s ease; }
+        .flow-values { display: flex; justify-content: space-between; gap: 16px; margin-top: 10px; color: var(--muted); font-size: 11px; }
+
+        footer { padding: 19px 0; color: var(--muted); font-size: 11px; text-align: center; }
+
+        @media (max-width: 680px) {
+            .shell { width: min(100% - 24px, 1180px); }
+            header { padding: 20px 0; }
+            main { padding: 28px 0 38px; }
+            .metrics { grid-template-columns: 1fr; gap: 10px; }
+            .card { min-height: 0; padding: 16px; }
+            .metric-value { margin-top: 9px; }
+            .panel-heading { padding: 17px 16px; }
+            th, td { padding: 12px 15px; }
+            .flow { padding: 17px 16px 19px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="shell">
+    <header>
+        <div class="brand">
+            <div class="brand-mark" aria-hidden="true">↗</div>
+            <div>
+                <div class="brand-name">Trading Operations</div>
+                <div class="brand-caption">Operationsübersicht</div>
+            </div>
+        </div>
+        <span class="live">Übersicht</span>
+    </header>
+
+    <main>
+        <section class="page-heading" aria-labelledby="page-title">
+            <h1 id="page-title">Operationen</h1>
+            <p class="intro">Alle erfassten Handelsoperationen auf einen Blick.</p>
+        </section>
+
+        <section class="metrics" aria-label="Zusammenfassung">
+            <article class="card">
+                <div class="metric-label">Operationen gesamt</div>
+                <div class="metric-value number" id="operation-count">0</div>
+                <div class="metric-foot">Erfasste Ein- und Verkäufe</div>
+            </article>
+            <article class="card">
+                <div class="metric-label">Kaufvolumen</div>
+                <div class="metric-value number positive" id="buy-volume">0,00 €</div>
+                <div class="metric-foot">Summe aller Kaufoperationen</div>
+            </article>
+            <article class="card">
+                <div class="metric-label">Verkaufsvolumen</div>
+                <div class="metric-value number negative" id="sell-volume">0,00 €</div>
+                <div class="metric-foot">Summe aller Verkaufsoperationen</div>
+            </article>
+        </section>
+
+        <section class="operations-panel" aria-labelledby="operations-title">
+            <div class="panel-heading">
+                <div>
+                    <h2 id="operations-title">Letzte Operationen</h2>
+                    <div class="panel-caption">Instrumente, Stückzahlen und Ausführungswerte</div>
+                </div>
+                <span class="count" id="operation-badge">0 Einträge</span>
+            </div>
+
+            <div class="table-wrap" th:if="${operations != null and !#lists.isEmpty(operations)}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th scope="col">Instrument</th>
+                        <th scope="col">Aktion</th>
+                        <th scope="col">Menge</th>
+                        <th scope="col">Preis</th>
+                        <th scope="col">Gesamtwert</th>
+                        <th scope="col">Zeitpunkt</th>
+                    </tr>
+                    </thead>
+                    <tbody id="operation-rows">
+                    <tr th:each="operation : ${operations}"
+                        th:attr="data-side=${operation.side},data-volume=${operation.quantity * operation.price}">
+                        <td>
+                            <span class="asset" th:text="${operation.symbol}">AAPL</span>
+                            <div class="subtle" th:text="${#strings.substring(operation.id.toString(), 0, 8)}">ID</div>
+                        </td>
+                        <td>
+                            <span class="side"
+                                  th:classappend="${operation.side.name() == 'BUY'} ? ' side-buy' : ' side-sell'"
+                                  th:text="${operation.side.name() == 'BUY'} ? 'Kauf' : 'Verkauf'">Kauf</span>
+                        </td>
+                        <td class="number" th:text="${#numbers.formatDecimal(operation.quantity, 1, 4)}">0</td>
+                        <td class="number" th:text="|${#numbers.formatDecimal(operation.price, 1, 2)} €|">0,00 €</td>
+                        <td class="number" th:text="|${#numbers.formatDecimal(operation.quantity * operation.price, 1, 2)} €|">
+                            0,00 €
+                        </td>
+                        <td class="number subtle"
+                            th:text="${#temporals.format(operation.timestamp, 'dd.MM.yyyy HH:mm')}">–</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="empty" th:if="${operations == null or #lists.isEmpty(operations)}">
+                <div class="empty-icon" aria-hidden="true">↗</div>
+                <p>Noch keine Operationen vorhanden.</p>
+            </div>
+
+            <div class="flow" aria-label="Verteilung des Handelsvolumens">
+                <div class="flow-heading">
+                    <h2>Volumenverteilung</h2>
+                    <div class="flow-legend" aria-hidden="true">
+                        <span class="legend-item"><span class="legend-dot legend-buy"></span>Käufe</span>
+                        <span class="legend-item"><span class="legend-dot legend-sell"></span>Verkäufe</span>
+                    </div>
+                </div>
+                <div class="flow-track" role="img" id="volume-chart" aria-label="Noch keine Operationen">
+                    <div class="flow-buy" id="buy-bar"></div>
+                    <div class="flow-sell" id="sell-bar"></div>
+                </div>
+                <div class="flow-values">
+                    <span id="buy-chart-value">Käufe: 0,00 €</span>
+                    <span id="sell-chart-value">Verkäufe: 0,00 €</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>Trading Operations · Übersicht der erfassten Handelsaktivitäten</footer>
+</div>
+
+<script>
+    (() => {
+        const rows = [...document.querySelectorAll("#operation-rows tr")];
+        const totals = rows.reduce((result, row) => {
+            const volume = Number(row.dataset.volume) || 0;
+            if (row.dataset.side === "BUY") result.buy += volume;
+            else if (row.dataset.side === "SELL") result.sell += volume;
+            return result;
+        }, { buy: 0, sell: 0 });
+
+        const formatCurrency = value => new Intl.NumberFormat("de-DE", {
+            style: "currency",
+            currency: "EUR"
+        }).format(value);
+
+        document.getElementById("operation-count").textContent = rows.length.toLocaleString("de-DE");
+        document.getElementById("operation-badge").textContent =
+            `${rows.length.toLocaleString("de-DE")} ${rows.length === 1 ? "Eintrag" : "Einträge"}`;
+        document.getElementById("buy-volume").textContent = formatCurrency(totals.buy);
+        document.getElementById("sell-volume").textContent = formatCurrency(totals.sell);
+        document.getElementById("buy-chart-value").textContent = `Käufe: ${formatCurrency(totals.buy)}`;
+        document.getElementById("sell-chart-value").textContent = `Verkäufe: ${formatCurrency(totals.sell)}`;
+
+        const totalVolume = totals.buy + totals.sell;
+        const buyShare = totalVolume === 0 ? 50 : (totals.buy / totalVolume) * 100;
+        document.getElementById("buy-bar").style.width = `${buyShare}%`;
+        document.getElementById("sell-bar").style.width = `${100 - buyShare}%`;
+        document.getElementById("volume-chart").setAttribute(
+            "aria-label",
+            totalVolume === 0
+                ? "Noch kein Handelsvolumen"
+                : `Käufe ${buyShare.toFixed(1)} Prozent, Verkäufe ${(100 - buyShare).toFixed(1)} Prozent`
+        );
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: operations
+  ai:
+    mcp:
+      server:
+        name: trading-operations-mcp-server
+        version: 1.0.0
+        type: SYNC
+        protocol: STREAMABLE
+        capabilities:
+          tool: false
+          resource: false
+          prompt: false
+          completion: false
+
+management:
