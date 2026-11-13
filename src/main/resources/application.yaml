@@ -9,9 +9,13 @@ spring:
         type: SYNC
         protocol: STREAMABLE
         capabilities:
-          tool: false
+          tool: true
           resource: false
           prompt: false
           completion: false
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

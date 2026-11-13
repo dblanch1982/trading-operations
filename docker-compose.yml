@@ -3,8 +3,9 @@ services:
     build:
       context: .
     ports:
-      - "${APP_PORT:-8080}:3000"
+      - "127.0.0.1:${APP_PORT:-8080}:3000"
     environment:
+      SERVER_PORT: "3000"
       SPRING_DATASOURCE_URL: "jdbc:h2:file:/app/data/operations;DB_CLOSE_ON_EXIT=FALSE"
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: ""

@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose configuration
+        run: docker compose config --quiet
+
+      - name: Build and start application
+        run: docker compose up --build --detach
+
+      - name: Smoke-test application
+        run: |
+          ready=false
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://localhost:8080/ >/dev/null; then
+              ready=true
+              break
+            fi
+            sleep 2
+          done
+
+          if [ "$ready" != true ]; then
+            docker compose logs
+            exit 1
+          fi
+
+          curl --fail --silent http://localhost:8080/api/operations >/dev/null
+
+      - name: Show application logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Stop application and remove CI data
+        if: always()
+        run: docker compose down --volumes
