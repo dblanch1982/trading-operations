@@ -42,4 +42,25 @@ public class TradingOperation {
     @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
+    public UUID getId() {
+        return id;
+    }
+
+    public String getSymbol() { 
+        return symbol;
+    }
+
+    public OrderSide getSide() {
+        return side;
+    }   
+    public double getQuantity() {
+        return quantity;
+    }       
+    public double getPrice() {  
+        return price;
+    } 
+    public Instant getTimestamp() {
+        return timestamp;
+    }
+
 }

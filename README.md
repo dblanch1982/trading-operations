@@ -1,5 +1,16 @@
 # trading-operations
 
+## Lokal bauen
+
+Für den Build wird JDK 25 benötigt. Unter Windows:
+
+```powershell
+.\mvnw.cmd package
+```
+
+Der Maven-Compiler verwendet Lombok explizit als Annotation-Processor, damit
+Getter, Setter und Konstruktoren auch mit JDK 25 generiert werden.
+
 ## Mit Docker Compose starten
 
 ```sh
