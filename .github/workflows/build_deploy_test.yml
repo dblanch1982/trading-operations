@@ -3,10 +3,19 @@ name: Build, Deploy, Publish
 # 1. Hier wird festgelegt, wann der Workflow startet
 on:
   workflow_dispatch: 
-    
-
+  push:
+    branches:
+      - main  
+    paths:
+      - '**'
+  pull_request:
+    branches:
+      - main  
+    paths:
+      - '**'    
 jobs:
   build:
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
